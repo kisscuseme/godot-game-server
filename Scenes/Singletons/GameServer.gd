@@ -23,4 +23,4 @@ func _Peer_Connected(player_id):
 
 func _Peer_Disconnected(player_id):
 	print("User " + str(player_id) + " Disconnected")
-	get_node("/root/GameServer/"+str(player_id)).queue_free()
+	get_node("/root/Main/"+str(player_id)).queue_free()
