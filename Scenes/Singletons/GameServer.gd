@@ -4,6 +4,8 @@ var network = NetworkedMultiplayerENet.new()
 var port = 1909
 var max_players = 100
 
+onready var node = get_node("/root/Main")
+
 func _ready():
 	StartServer()
 
@@ -18,9 +20,15 @@ func StartServer():
 
 func _Peer_Connected(player_id):
 	print("User " + str(player_id) + " Connected")
-	player_verification_process.start(player_id)
+	if not skip_auth:
+		player_verification_process.start(player_id)
+	else:
+		player_verification_process.CreatePlayerContainer(player_id)
 
 
 func _Peer_Disconnected(player_id):
 	print("User " + str(player_id) + " Disconnected")
-	get_node("/root/Main/"+str(player_id)).queue_free()
+	if node.has_node(str(player_id)):
+		node.get_node(str(player_id)).queue_free()
+		player_state_collection.erase(player_id)
+		rpc_id(0, "DespawnPlayer", player_id)

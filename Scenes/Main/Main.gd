@@ -10,5 +10,4 @@ func _on_TokenExpiration_timeout():
 			token_time = int(Game.expected_tokens[i].right(64))
 			if current_time - token_time >= 30:
 				Game.expected_tokens.remove(i)
-	print("Expected Tokens: ")
-	print(Game.expected_tokens)
+#	print("Expected Tokens: ", Game.expected_tokens)

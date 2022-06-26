@@ -1,6 +1,8 @@
 extends GameServerData
 class_name GameServerMethods
 
+onready var main = get_node("/root/Main")
+
 remote func FetchAction(action_name, value_name, requester = null):
 	var player_id = get_tree().get_rpc_sender_id()
 	var return_value
@@ -25,7 +27,21 @@ func GetSkillDamage(skill_name, player_id):
 
 
 func GetStats(player_id):
-	return get_node("/root/Main/"+str(player_id)).player_stats
+	return main.get_node(str(player_id)).player_stats
+
+
+remote func SendNPCHit(enemy_id, damage):
+	main.get_node("Map").NPCHit(enemy_id, damage)
+
+
+remote func FetchServerTime(client_time):
+	var player_id = get_tree().get_rpc_sender_id()
+	rpc_id(player_id, "ReturnServerTime", OS.get_system_time_msecs(), client_time)
+
+
+remote func DetermineLatency(client_time):
+	var player_id = get_tree().get_rpc_sender_id()
+	rpc_id(player_id, "ReturnLatency", client_time)
 
 
 func FetchToken(player_id):
@@ -39,3 +55,27 @@ remote func ReturnToken(token):
 
 func ReturnTokenVerificationResults(player_id, result):
 	rpc_id(player_id, "ReturnTokenVerificationResults", result)
+	if result == true:
+		rpc_id(0, "SpawnNewPlayer", player_id, Vector2(100, 100))
+
+
+remote func ReceivePlayerState(player_state):
+	var player_id = get_tree().get_rpc_sender_id()
+	if player_state_collection.has(player_id):
+		if player_state_collection[player_id]["T"] < player_state["T"]:
+			player_state_collection[player_id] = player_state
+	else:
+		player_state_collection[player_id] = player_state
+		
+
+func SendWorldState(world_state):
+	rpc_unreliable_id(0, "ReceiveWorldState", world_state)
+
+
+remote func Attack(position, animation_vector, spawn_time):
+	var player_id = get_tree().get_rpc_sender_id()
+	rpc_id(0, "ReceiveAttack", position, animation_vector, spawn_time, player_id)
+
+
+func DespawnEnemy(enemy):
+	rpc_id(0, "DespawnEnemy", enemy)

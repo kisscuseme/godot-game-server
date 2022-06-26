@@ -7,6 +7,10 @@ onready var skill_data = LoadData("SkillData")
 onready var stats_data = LoadData("StatsData")
 
 var expected_tokens = []
+var player_state_collection = {}
+
+var skip_auth = false
+
 
 func LoadData(data_name):
 	return LoadDataFromJSON(data_name)

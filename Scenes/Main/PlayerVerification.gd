@@ -11,19 +11,20 @@ func start(player_id):
 
 func Verify(player_id, token):
 	var token_verification = false
-	while OS.get_unix_time() - int(token.right(64)) <= 30:
-		if Game.expected_tokens.has(token):
-			token_verification = true
-			CreatePlayerContainer(player_id)
+	if token:
+		while OS.get_unix_time() - int(token.right(64)) <= 30:
+			if Game.expected_tokens.has(token):
+				token_verification = true
+				CreatePlayerContainer(player_id)
+				awaiting_verification.erase(player_id)
+				Game.expected_tokens.erase(token)
+				break
+			else:
+				yield(get_tree().create_timer(2), "timeout")
+		Game.ReturnTokenVerificationResults(player_id, token_verification)
+		if token_verification == false:
 			awaiting_verification.erase(player_id)
-			Game.expected_tokens.erase(token)
-			break
-		else:
-			yield(get_tree().create_timer(2), "timeout")
-	Game.ReturnTokenVerificationResults(player_id, token_verification)
-	if token_verification == false:
-		awaiting_verification.erase(player_id)
-		Game.network.disconnect_peer(player_id)
+			Game.network.disconnect_peer(player_id)
 
 
 func _on_VerificationExpiration_timeout():
@@ -40,8 +41,7 @@ func _on_VerificationExpiration_timeout():
 				if connected_peers.has(key):
 					Game.ReturnTokenVerificationResults(key, false)
 					Game.network.disconnect_peer(key)
-	print("Awaiting verification: ")
-	print(awaiting_verification)
+#	print("Awaiting verification: ", awaiting_verification)
 
 
 func CreatePlayerContainer(player_id):

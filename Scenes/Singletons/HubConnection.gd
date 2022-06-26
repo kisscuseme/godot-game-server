@@ -9,7 +9,7 @@ func _ready():
 	ConnectToServer()
 
 
-func _process(delta):
+func _process(_delta):
 	if self.custom_multiplayer == null:
 		return
 	if not self.custom_multiplayer.has_network_peer():
