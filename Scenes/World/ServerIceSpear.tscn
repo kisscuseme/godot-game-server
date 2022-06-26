@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 9, 9 )
+
+[node name="IceSpear" type="RigidBody2D"]
+collision_layer = 8
+collision_mask = 2
+contacts_reported = 1
+contact_monitor = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 4 )
