@@ -7,8 +7,6 @@ remote func FetchAction(action_name, value_name, requester = null):
 	var player_id = get_tree().get_rpc_sender_id()
 	var return_value
 	match action_name:
-		"skill_damage":
-			return_value = GetSkillDamage(value_name, player_id)
 		"get_data":
 			match value_name:
 				"Player Stats":
@@ -21,17 +19,8 @@ remote func FetchAction(action_name, value_name, requester = null):
 	print("sending " + str(return_value) + " to player")
 
 
-func GetSkillDamage(skill_name, player_id):
-	var damage = skill_data[skill_name].Damage * 0.1 * GetStats(player_id).Intelligence
-	return damage
-
-
 func GetStats(player_id):
 	return main.get_node(str(player_id)).player_stats
-
-
-remote func SendNPCHit(enemy_id, damage):
-	main.get_node("Map").NPCHit(enemy_id, damage)
 
 
 remote func FetchServerTime(client_time):
@@ -72,8 +61,9 @@ func SendWorldState(world_state):
 	rpc_unreliable_id(0, "ReceiveWorldState", world_state)
 
 
-remote func Attack(position, animation_vector, spawn_time):
+remote func Attack(position, animation_vector, spawn_time, a_rotation, a_position, a_direction):
 	var player_id = get_tree().get_rpc_sender_id()
+	get_node("/root/Main/WorldMap").SpawnAttack(spawn_time, a_rotation, a_position, a_direction, player_id)
 	rpc_id(0, "ReceiveAttack", position, animation_vector, spawn_time, player_id)
 
 

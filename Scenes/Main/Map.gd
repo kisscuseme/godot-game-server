@@ -36,6 +36,7 @@ func SpawnEnemy():
 			"EnemyState": "Idle",
 			"time_out": 1
 		}
+		get_node("/root/Main/WorldMap").SpawnEnemy(enemy_id_counter, location)
 		enemy_id_counter += 1
 	for enemy in enemy_list.keys():
 		if enemy_list[enemy]["EnemyState"] == "Dead":
@@ -52,6 +53,7 @@ func NPCHit(enemy_id, damage):
 		else:
 			enemy_list[enemy_id]["EnemyHealth"] = enemy_list[enemy_id]["EnemyHealth"] - damage
 			if enemy_list[enemy_id]["EnemyHealth"] <= 0:
+				get_node("/root/Main/WorldMap/YSort/Enemies/" + str(enemy_id)).queue_free()
 				enemy_list[enemy_id]["EnemyState"] = "Dead"
 				open_locations.append(occupied_locations[enemy_id])
 				occupied_locations.erase(enemy_id)
