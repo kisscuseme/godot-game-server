@@ -33,6 +33,7 @@ func _OnConnectionFailed():
 
 func _OnConnectionSucceeded():
 	print("Successfully connected to Game Server Hub")
+	rpc_id(1, "RegisterGameServer", network.get_unique_id())
 
 
 remote func ReceiveLoginToken(token):
