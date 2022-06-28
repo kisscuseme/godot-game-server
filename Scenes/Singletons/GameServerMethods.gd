@@ -1,7 +1,7 @@
 extends GameServerData
 class_name GameServerMethods
 
-onready var main = get_node("/root/Main")
+onready var game_server = get_node("/root/GameServer")
 
 remote func FetchAction(action_name, value_name, requester = null):
 	var player_id = get_tree().get_rpc_sender_id()
@@ -20,7 +20,7 @@ remote func FetchAction(action_name, value_name, requester = null):
 
 
 func GetStats(player_id):
-	return main.get_node(str(player_id)).player_stats
+	return game_server.get_node(str(player_id)).player_stats
 
 
 remote func FetchServerTime(client_time):
@@ -39,7 +39,7 @@ func FetchToken(player_id):
 
 remote func ReturnToken(token):
 	var player_id = get_tree().get_rpc_sender_id()
-	player_verification_process.Verify(player_id, token)
+	GlobalData.player_verification_process.Verify(player_id, token)
 
 
 func ReturnTokenVerificationResults(player_id, result):
@@ -50,11 +50,11 @@ func ReturnTokenVerificationResults(player_id, result):
 
 remote func ReceivePlayerState(player_state):
 	var player_id = get_tree().get_rpc_sender_id()
-	if player_state_collection.has(player_id):
-		if player_state_collection[player_id]["T"] < player_state["T"]:
-			player_state_collection[player_id] = player_state
+	if GlobalData.player_state_collection.has(player_id):
+		if GlobalData.player_state_collection[player_id]["T"] < player_state["T"]:
+			GlobalData.player_state_collection[player_id] = player_state
 	else:
-		player_state_collection[player_id] = player_state
+		GlobalData.player_state_collection[player_id] = player_state
 		
 
 func SendWorldState(world_state):
@@ -63,7 +63,7 @@ func SendWorldState(world_state):
 
 remote func Attack(position, animation_vector, spawn_time, a_rotation, a_position, a_direction):
 	var player_id = get_tree().get_rpc_sender_id()
-	get_node("/root/Main/WorldMap").SpawnAttack(spawn_time, a_rotation, a_position, a_direction, player_id)
+	get_node("/root/GameServer/WorldMap").SpawnAttack(spawn_time, a_rotation, a_position, a_direction, player_id)
 	rpc_id(0, "ReceiveAttack", position, animation_vector, spawn_time, player_id)
 
 

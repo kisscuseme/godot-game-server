@@ -7,6 +7,8 @@ var impulse_rotation
 var player_id
 var damage
 
+onready var game_server = get_node("/root/GameServer")
+
 
 func _ready():
 	SetDamage()
@@ -16,7 +18,7 @@ func _ready():
 
 
 func SetDamage():
-	damage = Game.skill_data["Ice Spear"].Damage * (0.1 * get_node("/root/Main/" + str(player_id)).player_stats.Intelligence)
+	damage = game_server.skill_data["Ice Spear"].Damage * (0.1 * get_node("/root/GameServer/" + str(player_id)).player_stats.Intelligence)
 
 
 func SelfDestruct():
@@ -28,6 +30,5 @@ func _on_IceSpear_body_entered(body):
 	$CollisionShape2D.set_deferred("disabled", true)
 	if body.is_in_group("NPCEnemies"):
 		var enemy_id = int(body.name)
-		get_node("/root/Main/Map").NPCHit(enemy_id, damage)
-		print(damage)
+		get_node("/root/GameServer/Map").NPCHit(enemy_id, damage)
 	self.hide()

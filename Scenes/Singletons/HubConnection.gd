@@ -37,4 +37,4 @@ func _OnConnectionSucceeded():
 
 
 remote func ReceiveLoginToken(token):
-	Game.expected_tokens.append(token)
+	GlobalData.expected_tokens.append(token)

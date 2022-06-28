@@ -8,6 +8,8 @@ var open_locations = []
 var occupied_locations = {}
 var enemy_list = {}
 
+onready var game_server = get_node("/root/GameServer")
+
 func _ready():
 	for i in enemy_spawn_points.size():
 		open_locations.append(i)
@@ -36,13 +38,13 @@ func SpawnEnemy():
 			"EnemyState": "Idle",
 			"time_out": 1
 		}
-		get_node("/root/Main/WorldMap").SpawnEnemy(enemy_id_counter, location)
+		get_node("/root/GameServer/WorldMap").SpawnEnemy(enemy_id_counter, location)
 		enemy_id_counter += 1
 	for enemy in enemy_list.keys():
 		if enemy_list[enemy]["EnemyState"] == "Dead":
 			if enemy_list[enemy]["time_out"]  == 0:
 				enemy_list.erase(enemy)
-				Game.DespawnEnemy(enemy)
+				game_server.DespawnEnemy(enemy)
 			else:
 				enemy_list[enemy]["time_out"] -= 1 
 
@@ -53,7 +55,7 @@ func NPCHit(enemy_id, damage):
 		else:
 			enemy_list[enemy_id]["EnemyHealth"] = enemy_list[enemy_id]["EnemyHealth"] - damage
 			if enemy_list[enemy_id]["EnemyHealth"] <= 0:
-				get_node("/root/Main/WorldMap/YSort/Enemies/" + str(enemy_id)).queue_free()
+				get_node("/root/GameServer/WorldMap/YSort/Enemies/" + str(enemy_id)).queue_free()
 				enemy_list[enemy_id]["EnemyState"] = "Dead"
 				open_locations.append(occupied_locations[enemy_id])
 				occupied_locations.erase(enemy_id)

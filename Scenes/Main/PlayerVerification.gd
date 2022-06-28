@@ -4,27 +4,29 @@ onready var player_container_scene = preload("res://Scenes/Instances/PlayerConta
 
 var awaiting_verification = {}
 
+onready var game_server = get_node("/root/GameServer")
+
 func start(player_id):
 	awaiting_verification[player_id] = {"Timestamp": OS.get_unix_time()}
-	Game.FetchToken(player_id)
+	game_server.FetchToken(player_id)
 
 
 func Verify(player_id, token):
 	var token_verification = false
 	if token:
 		while OS.get_unix_time() - int(token.right(64)) <= 30:
-			if Game.expected_tokens.has(token):
+			if GlobalData.expected_tokens.has(token):
 				token_verification = true
 				CreatePlayerContainer(player_id)
 				awaiting_verification.erase(player_id)
-				Game.expected_tokens.erase(token)
+				GlobalData.expected_tokens.erase(token)
 				break
 			else:
 				yield(get_tree().create_timer(2), "timeout")
-		Game.ReturnTokenVerificationResults(player_id, token_verification)
+		game_server.ReturnTokenVerificationResults(player_id, token_verification)
 		if token_verification == false:
 			awaiting_verification.erase(player_id)
-			Game.network.disconnect_peer(player_id)
+			game_server.network.disconnect_peer(player_id)
 
 
 func _on_VerificationExpiration_timeout():
@@ -39,8 +41,8 @@ func _on_VerificationExpiration_timeout():
 				awaiting_verification.erase(key)
 				var connected_peers = Array(get_tree().get_network_connected_peers())
 				if connected_peers.has(key):
-					Game.ReturnTokenVerificationResults(key, false)
-					Game.network.disconnect_peer(key)
+					game_server.ReturnTokenVerificationResults(key, false)
+					game_server.network.disconnect_peer(key)
 #	print("Awaiting verification: ", awaiting_verification)
 
 
@@ -52,4 +54,4 @@ func CreatePlayerContainer(player_id):
 	FillPlayerContainer(player_container)
 
 func FillPlayerContainer(player_container):
-	player_container.player_stats = Game.stats_data.Stats
+	player_container.player_stats = game_server.stats_data.Stats
